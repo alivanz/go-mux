@@ -9,11 +9,14 @@ import (
 )
 
 func ServeSimpleHandler(h SimpleHandler, server io.ReadWriteCloser) error {
-	server_session, _ := smux.Server(server, nil)
+	server_session, err := smux.Server(server, nil)
+	if err != nil {
+		return err
+	}
 	for {
 		stream, err := server_session.AcceptStream()
 		if err != nil {
-			return nil
+			return err
 		}
 		reader := utils.NewBinaryReader(stream)
 		tag, err := reader.ReadUint64()
@@ -26,12 +29,15 @@ func ServeSimpleHandler(h SimpleHandler, server io.ReadWriteCloser) error {
 }
 
 func ServeHandler(h Handler, server io.ReadWriteCloser) error {
-	server_session, _ := smux.Server(server, nil)
+	server_session, err := smux.Server(server, nil)
+	if err != nil {
+		return err
+	}
 	for {
 		// log.Print("session.AcceptStream")
 		stream, err := server_session.AcceptStream()
 		if err != nil {
-			return nil
+			return err
 		}
 		// log.Print("new stream")
 		reader := utils.NewBinaryReader(stream)
